@@ -1,0 +1,22 @@
+{
+  "scope": "200 selected extraction chunks, batch 8; original measured responses, counted once",
+  "model": "openai/gpt-oss-120b",
+  "provider": "groq",
+  "reasoning_effort": "low",
+  "stages": {
+    "coref": {
+      "cached_batches": 25,
+      "prompt_tokens": 20980,
+      "completion_tokens": 22235,
+      "total_tokens": 43215
+    },
+    "extract": {
+      "cached_batches": 25,
+      "prompt_tokens": 37904,
+      "completion_tokens": 12340,
+      "total_tokens": 50244
+    }
+  },
+  "total_tokens": 93459,
+  "cache_replay_is_new_api_usage": false
+}

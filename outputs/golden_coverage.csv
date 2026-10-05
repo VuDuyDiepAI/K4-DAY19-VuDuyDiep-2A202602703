@@ -1,0 +1,6 @@
+id,group,corpus_covered,vector_covered,extraction_covered
+G5000-26,multi-hop,True,True,True
+G5000-27,cross-doc,True,True,True
+G5000-28,multi-hop,True,True,True
+G5000-29,cross-doc,True,True,True
+G5000-41,factoid,True,True,True

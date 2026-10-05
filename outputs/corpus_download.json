@@ -1,0 +1,21 @@
+{
+  "dataset": "HackerNoon/tech-company-news-data-dump",
+  "split": "train",
+  "downloaded_rows": 5000,
+  "columns": [
+    "companyName",
+    "companyUrl",
+    "published_at",
+    "url",
+    "title",
+    "main_image",
+    "description"
+  ],
+  "downloaded_at_utc": "2026-10-05T14:25:17.881512+00:00",
+  "source": "live Hugging Face stream; original Golden row order must be verified",
+  "revision": "cc6144ccce683dcebb6e63f9a50ca084544af1c0",
+  "source_files": [
+    "cleanedCompanyNews.csv",
+    "escapedCompanyNews.csv"
+  ]
+}

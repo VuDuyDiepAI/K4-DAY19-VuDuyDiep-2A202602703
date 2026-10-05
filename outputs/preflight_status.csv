@@ -1,0 +1,12 @@
+check,status,detail
+JUDGE_PROVIDER,configured,groq
+NEO4J_URI,configured,
+NEO4J_PASSWORD,configured,
+GROQ_API_KEY,configured,
+GROQ_MODEL,configured,
+JUDGE_MODEL,configured,
+corpus,present,
+HF_TOKEN,configured,
+neo4j_driver,passed,194 existing nodes; lab queries are namespaced
+groq_request,passed,
+judge_request,passed,

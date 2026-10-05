@@ -23,6 +23,11 @@ golden_dataset.csv
 *.jsonl
 *.parquet
 *.pq
+data/hackernoon_subset.csv*
+outputs/.cache/
+outputs/raw_chunks.csv
+outputs/coref_checkpoint.csv
+outputs/triples_checkpoint.csv
 
 # OS files
 .DS_Store
