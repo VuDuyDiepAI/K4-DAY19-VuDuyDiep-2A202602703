@@ -1,6 +1,6 @@
 # Phân tích hai ca thực nghiệm
 
-Giữ nguyên điểm API Judge trong CSV. Review nguồn dưới đây là đánh giá bổ sung có hỗ trợ của Agent, không phải điểm Judge mới. Bằng chứng công khai: [failure_case_traces.json](../outputs/failure_case_traces.json), [coref_spotcheck.csv](../outputs/coref_spotcheck.csv) và [diagnostic_initial_case.json](../outputs/diagnostic_initial_case.json).
+Giữ nguyên điểm API Judge trong CSV. Review nguồn là đánh giá bổ sung có hỗ trợ của Agent, không phải điểm Judge mới. Context, diagnostics, coref spot-check và diagnostic trước được trình bày trong section 5.1 của notebook.
 
 ### G5000-29 — cross-doc
 
@@ -32,7 +32,7 @@ Thus, participation broadened from the original seven companies in July to at le
 
 **Câu trả lời được nguồn hỗ trợ:** “Tháng 7 có 7 công ty, trong đó có Google, Meta và OpenAI. Tháng 9, nhóm ký các cam kết tương tự gồm IBM, Adobe, Salesforce và 5 công ty khác; điều này cho thấy phạm vi tham gia rộng hơn. Các snippets không đủ roster để xác nhận tổng số công ty duy nhất.”
 
-**Khắc phục đề xuất:** tách cohort/date khỏi cumulative count; chỉ tính tổng khi có danh sách thành viên và kiểm tra giao hai tập. Bổ sung kiểm tra claim–evidence cho số đếm trong Judge và review người dùng. Nếu mở rộng schema, dùng sự kiện `Commitment` và `SIGNED` có ngày, thay vì ép thành `PARTNERED_WITH`. Các thay đổi này chưa được benchmark trong bài nộp. Trace lần chạy đầu được giữ riêng trong `diagnostic_initial_case.json`; không dùng nó để thay điểm CSV cuối.
+**Khắc phục đề xuất:** tách cohort/date khỏi cumulative count; chỉ tính tổng khi có danh sách thành viên và kiểm tra giao hai tập. Bổ sung kiểm tra claim–evidence cho số đếm trong Judge và review người dùng. Nếu mở rộng schema, dùng sự kiện `Commitment` và `SIGNED` có ngày, thay vì ép thành `PARTNERED_WITH`. Các thay đổi này chưa được benchmark trong bài nộp. Câu trả lời và điểm Judge của lần diagnostic đầu được ghi rõ trong section 5.1 notebook; không dùng nó để thay điểm CSV cuối.
 
 ### G5000-26 — multi-hop
 

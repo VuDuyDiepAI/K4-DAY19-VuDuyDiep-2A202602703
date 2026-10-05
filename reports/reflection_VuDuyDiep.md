@@ -15,7 +15,7 @@
 
 Các lỗi sau có trong quá trình thực hiện lab với sự hỗ trợ của Agent:
 
-1. `pytest tests/test_base.py` báo không tìm thấy file và `jupyter` chưa được nhận diện. Cần kiểm tra cấu trúc repo và interpreter của `.venv`; sau đó bổ sung tests/dependencies còn thiếu và gọi Jupyter qua Python của môi trường đó. Một lệnh có trong hướng dẫn chưa chứng minh file/gói tương ứng đã tồn tại.
+1. `pytest tests/test_base.py` báo không tìm thấy file và `jupyter` chưa được nhận diện. Cần kiểm tra cấu trúc repo và interpreter của `.venv`; sau đó bổ sung dependencies và kiểm tra bằng tests local và gọi Jupyter qua Python của môi trường đó. Một lệnh có trong hướng dẫn chưa chứng minh file/gói tương ứng đã tồn tại.
 2. Có `HF_TOKEN` vẫn chưa tải được dataset vì tài khoản cần chấp nhận điều kiện truy cập. Docker cũng cần daemon/container và kết nối driver hoạt động. Bài học là kiểm tra từng lớp: credential → quyền truy cập → dịch vụ → request thực tế.
 3. CSV HackerNoon có `title` và `description`, còn loader ban đầu tìm `text/content/body`. Đã sửa fallback theo schema thật, giữ tiêu đề làm evidence và ghi `title_and_description` trong manifest. Không suy diễn mô tả ngắn thành toàn bộ bài báo.
 4. Model Groq mặc định trả HTTP 404. Đã kiểm tra danh sách model theo key, dùng model truy cập được và thử request JSON. Đồng thời chọn Groq cho cả generator/Judge để dùng chung key; kết luận benchmark vẫn phụ thuộc model và quota được ghi nhận.

@@ -52,8 +52,7 @@ Xem **[RUBRIC.md](RUBRIC.md)** để biết tiêu chí đánh giá và thang đi
 | **Python 3.10+ / Colab** | ✅ Có | Môi trường thực thi Notebook |
 | `HF_TOKEN` | ✅ Có | Stream dataset từ Hugging Face (`HackerNoon`) |
 | `GROQ_API_KEY` | ✅ Có | Coreference, NER+RE Extraction, Seed Extraction, Generator |
-| `OPENAI_API_KEY` | ⚠️ Theo provider | Judge khi `JUDGE_PROVIDER=openai` |
-| `GEMINI_API_KEY` | ⚠️ Theo provider | Judge khi `JUDGE_PROVIDER=gemini`; Groq vẫn xử lý extraction/generation |
+| `OPENAI_API_KEY` | ⚠️ Có thể thay thế | LLM-as-a-Judge (có thể cấu hình dùng Groq hoặc OpenAI) |
 
 ### Cấu hình Secrets (Colab Secrets hoặc `.env`)
 
@@ -66,36 +65,14 @@ NEO4J_PASSWORD=<your-password>
 NEO4J_DATABASE=neo4j
 
 GROQ_API_KEY=gsk_...
-GROQ_MODEL=openai/gpt-oss-120b
-GROQ_REASONING_EFFORT=low
-LAB_EXTRACTION_CHUNKS=200            # trong scale guard tối đa 400
-LAB_COREF_BATCH_SIZE=8
-LAB_EXTRACTION_BATCH_SIZE=8
+GROQ_MODEL=llama-3.3-70b-versatile
 
-JUDGE_PROVIDER=groq                 # 'groq', 'openai' hoặc 'gemini'
-JUDGE_MODEL=openai/gpt-oss-120b
-OPENAI_API_KEY=sk-...               # tùy chọn: chỉ khi JUDGE_PROVIDER=openai
+JUDGE_PROVIDER=openai               # 'openai' hoặc 'groq'
+JUDGE_MODEL=gpt-4o-mini             # hoặc llama-3.3-70b-versatile
+OPENAI_API_KEY=sk-...
 
 HF_TOKEN=hf_...                     # Hugging Face User Access Token
 ```
-
-Mặc định pipeline và Judge dùng chung `GROQ_API_KEY`; không cần OpenAI/Gemini key.
-Model `openai/gpt-oss-120b` được phục vụ trên Groq, request gửi tới Groq và dùng quota Groq.
-Kiểm tra model tài khoản truy cập được theo [danh sách model Groq](https://console.groq.com/docs/models).
-CSV HackerNoon hiện cung cấp `title` và `description`: pipeline ghép hai trường làm văn bản nguồn và ghi loại văn bản trong manifest.
-Sample mặc định dùng 1.500 bài cho vector index, 200 chunks cho graph và 5 Golden queries có nguồn được đối chiếu; các scale guard vẫn là 1.500/3.000/400.
-
-Nếu muốn giữ Groq cho pipeline và dùng Gemini làm Judge, đổi riêng cấu hình Judge trong `.env`:
-
-```dotenv
-JUDGE_PROVIDER=gemini
-JUDGE_MODEL=gemini-2.5-flash
-GEMINI_API_KEY=your-gemini-api-key
-```
-
-Tạo key tại [Google AI Studio](https://aistudio.google.com/apikey). Cấu hình này không cần `OPENAI_API_KEY`.
-Gemini dùng [endpoint tương thích](https://ai.google.dev/gemini-api/docs/openai) và JSON schema cho điểm Judge;
-Gemini 2.5 Flash có [Free Tier với quota](https://ai.google.dev/gemini-api/docs/pricing). Sau khi đổi `.env`, restart kernel hoặc chạy lại cell imports/config.
 
 > [!WARNING]
 > **Tuyệt đối không hard-code API Key hoặc mật khẩu Neo4j** vào notebook khi nộp bài.
@@ -183,32 +160,3 @@ Học viên commit và push lên GitHub cá nhân:
 1. `Day19_GraphRAG_vs_FlatRAG_Production_Lab_Guide.ipynb` (Notebook đã chạy đầy đủ output các cell).
 2. `outputs/graphrag_eval_results.csv` và `outputs/graphrag_vs_flatrag_summary.csv`.
 3. `reports/lab_report.md` (Điền đầy đủ 2 phần: Thuyết minh kỹ thuật & Suy ngẫm cá nhân).
-
-## Chạy pipeline local đã triển khai
-
-Xem [WORKFLOW.md](WORKFLOW.md) và [trạng thái thực hiện](reports/execution_status.md).
-Notebook gọi implementation trong `lab19_runtime.py`; có CLI tương đương để chạy và resume.
-
-Sau khi điền secrets thật vào `.env` và cung cấp corpus nguồn:
-
-```powershell
-.\.venv\Scripts\python.exe scripts\run_lab.py --stage preflight
-.\.venv\Scripts\python.exe scripts\run_lab.py --stage run
-.\.venv\Scripts\python.exe scripts\execute_notebook.py
-```
-
-Nếu cần tải corpus, cấu hình `HF_TOKEN` và quyền truy cập dataset trước rồi chạy
-`scripts/download_corpus.py`. Pipeline đối chiếu nguồn Golden trước khi chọn sample;
-hai CSV tên `golden_50` trong repo hiện chỉ chứa 25 câu.
-
-Kiểm tra offline: `python -m pytest tests/test_base.py -q`.
-Cell ghi `PENDING` khi chưa có dữ liệu/secrets; chỉ coi benchmark hoàn thành khi evaluation thật
-đã xuất hai CSV bắt buộc. Fixture/test results được ghi riêng với kết quả tin tức thật.
-
-Lần chạy hoàn tất ngày 05/10/2026: notebook 22 code cells, 0 errors/0 PENDING;
-graph 97 nodes/52 edges, 0 cạnh thiếu provenance; 40 tests pass.
-Đọc [báo cáo tổng hợp](reports/lab_report.md), [thuyết minh](reports/technical_defense.md),
-[phân tích hai ca lỗi](reports/failure_analysis.md) và [Reflection/Action Plan](reports/reflection_VuDuyDiep.md).
-Raw Judge chấm hai phương pháp ngang nhau; review nguồn phát hiện Judge bỏ sót một suy diễn số tổng.
-Sample title/description và 5 queries chưa đủ để kết luận GraphRAG tốt hơn Flat RAG.
-Trace hai ca được lưu công khai trong `outputs/failure_case_traces.json`; dữ liệu tải và cache ở local, không commit.

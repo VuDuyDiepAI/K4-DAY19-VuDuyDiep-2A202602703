@@ -10,7 +10,7 @@ Học viên: Vũ Duy Diệp. Ngày: 2026-10-05.
 
 Trong chunk này, “the smart home manufacturer” chỉ Aqara, nhưng model thay bằng Samsung, tạo câu Samsung làm việc với Samsung. Guard số không bắt được lỗi ngữ nghĩa này. Triple cuối vẫn là Samsung `PARTNERED_WITH` Aqara vì extractor lấy evidence từ title gốc; không có bằng chứng false edge từ chunk này đã đi vào graph. Chunk `69178d0227a0ff6c4b24::c0000` còn thay “the company” bằng tên sản phẩm PolsoTM; không có triple được chấp nhận. Nếu tin rewrite mà bỏ evidence gốc, các lỗi này có thể gán sai chủ thể hoặc mất cạnh sau lọc self-loop.
 
-200 chunks: 178 unchanged, 21 text rewrites và 1 rejected; `resolved` không bảo đảm một đại từ đã được phân giải đúng vì có cả sửa dấu câu. Spot-check 5 trường hợp có nhận xét trong `coref_spotcheck.csv`. Numeric guard reject `144366` → `144,366` ở `82639690c6f0f9db3de3::c0000`: giá trị không đổi nhưng cách biểu diễn khác. Cần chuẩn hóa số trước kiểm tra và thêm semantic validation cho antecedent.
+200 chunks: 178 unchanged, 21 text rewrites và 1 rejected; `resolved` không bảo đảm một đại từ đã được phân giải đúng vì có cả sửa dấu câu. Spot-check 5 trường hợp có nhận xét trong output section 5.1 notebook. Numeric guard reject `144366` → `144,366` ở `82639690c6f0f9db3de3::c0000`: giá trị không đổi nhưng cách biểu diễn khác. Cần chuẩn hóa số trước kiểm tra và thêm semantic validation cho antecedent.
 
 2. **Ngưỡng entity:** cosine ≥0.90 trên embeddings normalized, HNSW candidates, guard theo tên/type và hậu tố; Union-Find canonicalization. Precision được ưu tiên vì false merge làm lan cạnh sai.
 
@@ -24,7 +24,6 @@ Fixture tên riêng dưới đây dùng **embedding MiniLM thật**, được l�
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | synthetic name-pair fixture; real MiniLM embeddings | Technology | Microsoft Windows 11 | Microsoft Windows 11 Pro | 0.8968769311904907 | False | False | REJECT_THRESHOLD |
 | synthetic name-pair fixture; real MiniLM embeddings | Technology | Microsoft Windows 11 Pro | Microsoft Windows 11 Pro N | 0.9490051865577698 | False | True | REJECT_GUARD |
-| synthetic name-pair fixture; real MiniLM embeddings | Technology | Microsoft Azure Active Directory | Microsoft Azure Active Directory Connect | 0.85478675365448 | False | False | REJECT_THRESHOLD |
 
 Guard này ưu tiên tránh false merge nhưng có thể false split tên đầy đủ/alias. Threshold 0.90 là cấu hình baseline, chưa được hiệu chỉnh từ nhãn ER trên toàn bộ HackerNoon.
 
@@ -69,18 +68,18 @@ Phạm vi thực đo: 5000 bản ghi nguồn, 1500 bài được chọn, 1500 ch
 
 7. **Ca lỗi và giới hạn kết luận chất lượng:** các điểm Judge cuối đều 5/5 nhưng review G5000-29 phát hiện số tổng không được snippets hỗ trợ. G5000-26 có `NO_SEED` và graph context rỗng; Hybrid trả lời được nhờ vector. Lần diagnostic trước có Flat nhầm nhóm tháng 9 là tổng số, Judge Flat 1/Graph 5, nhưng Graph vẫn suy diễn số tổng. Không có ca đã kiểm chứng đủ để kết luận graph tự nó sửa được lỗi Flat. Xem `failure_analysis.md` và trace; không chọn riêng lần chạy tốt để khẳng định Graph thắng. Generator và Judge cùng Groq model nên không phải phép đánh giá độc lập.
 
-8. **Latency/token:** latency chính bao gồm retrieval + generation và loại Judge; token online Graph bao gồm seed extraction + generation. `usage_log.json` ghi request phát sinh trong phiên; cache replay không phát sinh request nên không được đếm lại. `offline_usage_summary.json` tổng hợp usage gốc của 25 coref + 25 extraction batches: 43.215 + 50.244 = 93.459 tokens, không nằm trong token/query online. Embedding chạy local CPU. Missing usage giữ trạng thái thiếu; bài nộp không quy đổi tokens thành giá tiền.
+8. **Latency/token:** latency chính bao gồm retrieval + generation và loại Judge; token online Graph bao gồm seed extraction + generation. Usage log local ghi request phát sinh trong phiên; cache replay không phát sinh request nên không được đếm lại. Thống kê checkpoint local tổng hợp usage gốc của 25 coref + 25 extraction batches: 43.215 + 50.244 = 93.459 tokens, không nằm trong token/query online. Embedding chạy local CPU. Missing usage giữ trạng thái thiếu; bài nộp không quy đổi tokens thành giá tiền.
 
 Trung bình cuối: Flat 3.514s, Hybrid 5.661s (Δ 2.146s); Flat 899.0 tokens/query, Hybrid 1179.8 (Δ 280.8). Với sample nhỏ này, Hybrid tăng token mà chưa có lợi thế chất lượng được review xác nhận. Latency chịu ảnh hưởng mạng, quota/retry và thứ tự gọi, không thể quy toàn bộ chênh lệch cho BFS. Cache replay giữ latency của request đo ban đầu, không đo lại tốc độ đọc cache.
 
-9. **Kiểm soát AI Agent:** trong phiên thực hiện, người dùng đã chọn dùng Groq cho cả pipeline và Judge sau khi cân nhắc OpenAI/Gemini. Cấu hình cuối dùng chung Groq key và ghi model/reasoning trong manifest; đây là quyết định đơn giản hóa cấu hình, không phải bằng chứng hai Judge khác nhau có chất lượng tương đương. Các biện pháp kiểm chứng thêm gồm HNSW thay cho ma trận pairwise toàn corpus, kiểm tra allowlist/evidence và giữ điểm benchmark đúng với request thật.
+9. **Kiểm soát AI Agent:** trong phiên thực hiện, người dùng đã chọn dùng Groq cho cả pipeline và Judge sau khi cân nhắc OpenAI/Gemini. Cấu hình cuối dùng chung Groq key và ghi model/reasoning trong output notebook cùng manifest local; đây là quyết định đơn giản hóa cấu hình, không phải bằng chứng hai Judge khác nhau có chất lượng tương đương. Các biện pháp kiểm chứng thêm gồm HNSW thay cho ma trận pairwise toàn corpus, kiểm tra allowlist/evidence và giữ điểm benchmark đúng với request thật.
 
 10. **Scale 350MB:** đo bottleneck trước khi scale; LLM extraction có thể bị rate limit/chi phí và indexing tăng theo số chunks. Dùng streaming, durable worker queue, batch/retry/resume, HNSW + blocking theo type, ingestion UNWIND và graph partitioning. Không gửi toàn bộ dữ liệu qua LLM trong timebox lab.
 
 
 # Phân tích hai ca thực nghiệm
 
-Giữ nguyên điểm API Judge trong CSV. Review nguồn dưới đây là đánh giá bổ sung có hỗ trợ của Agent, không phải điểm Judge mới. Bằng chứng công khai: [failure_case_traces.json](../outputs/failure_case_traces.json), [coref_spotcheck.csv](../outputs/coref_spotcheck.csv) và [diagnostic_initial_case.json](../outputs/diagnostic_initial_case.json).
+Giữ nguyên điểm API Judge trong CSV. Review nguồn là đánh giá bổ sung có hỗ trợ của Agent, không phải điểm Judge mới. Context, diagnostics, coref spot-check và diagnostic trước được trình bày trong section 5.1 của notebook.
 
 ### G5000-29 — cross-doc
 
@@ -112,7 +111,7 @@ Thus, participation broadened from the original seven companies in July to at le
 
 **Câu trả lời được nguồn hỗ trợ:** “Tháng 7 có 7 công ty, trong đó có Google, Meta và OpenAI. Tháng 9, nhóm ký các cam kết tương tự gồm IBM, Adobe, Salesforce và 5 công ty khác; điều này cho thấy phạm vi tham gia rộng hơn. Các snippets không đủ roster để xác nhận tổng số công ty duy nhất.”
 
-**Khắc phục đề xuất:** tách cohort/date khỏi cumulative count; chỉ tính tổng khi có danh sách thành viên và kiểm tra giao hai tập. Bổ sung kiểm tra claim–evidence cho số đếm trong Judge và review người dùng. Nếu mở rộng schema, dùng sự kiện `Commitment` và `SIGNED` có ngày, thay vì ép thành `PARTNERED_WITH`. Các thay đổi này chưa được benchmark trong bài nộp. Trace lần chạy đầu được giữ riêng trong `diagnostic_initial_case.json`; không dùng nó để thay điểm CSV cuối.
+**Khắc phục đề xuất:** tách cohort/date khỏi cumulative count; chỉ tính tổng khi có danh sách thành viên và kiểm tra giao hai tập. Bổ sung kiểm tra claim–evidence cho số đếm trong Judge và review người dùng. Nếu mở rộng schema, dùng sự kiện `Commitment` và `SIGNED` có ngày, thay vì ép thành `PARTNERED_WITH`. Các thay đổi này chưa được benchmark trong bài nộp. Câu trả lời và điểm Judge của lần diagnostic đầu được ghi rõ trong section 5.1 notebook; không dùng nó để thay điểm CSV cuối.
 
 ### G5000-26 — multi-hop
 
@@ -155,7 +154,7 @@ Alongside this, Amazon also announced a new **health‑care system that can gene
 
 Các lỗi sau có trong quá trình thực hiện lab với sự hỗ trợ của Agent:
 
-1. `pytest tests/test_base.py` báo không tìm thấy file và `jupyter` chưa được nhận diện. Cần kiểm tra cấu trúc repo và interpreter của `.venv`; sau đó bổ sung tests/dependencies còn thiếu và gọi Jupyter qua Python của môi trường đó. Một lệnh có trong hướng dẫn chưa chứng minh file/gói tương ứng đã tồn tại.
+1. `pytest tests/test_base.py` báo không tìm thấy file và `jupyter` chưa được nhận diện. Cần kiểm tra cấu trúc repo và interpreter của `.venv`; sau đó bổ sung dependencies và kiểm tra bằng tests local và gọi Jupyter qua Python của môi trường đó. Một lệnh có trong hướng dẫn chưa chứng minh file/gói tương ứng đã tồn tại.
 2. Có `HF_TOKEN` vẫn chưa tải được dataset vì tài khoản cần chấp nhận điều kiện truy cập. Docker cũng cần daemon/container và kết nối driver hoạt động. Bài học là kiểm tra từng lớp: credential → quyền truy cập → dịch vụ → request thực tế.
 3. CSV HackerNoon có `title` và `description`, còn loader ban đầu tìm `text/content/body`. Đã sửa fallback theo schema thật, giữ tiêu đề làm evidence và ghi `title_and_description` trong manifest. Không suy diễn mô tả ngắn thành toàn bộ bài báo.
 4. Model Groq mặc định trả HTTP 404. Đã kiểm tra danh sách model theo key, dùng model truy cập được và thử request JSON. Đồng thời chọn Groq cho cả generator/Judge để dùng chung key; kết luận benchmark vẫn phụ thuộc model và quota được ghi nhận.

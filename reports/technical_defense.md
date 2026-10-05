@@ -10,7 +10,7 @@ Học viên: Vũ Duy Diệp. Ngày: 2026-10-05.
 
 Trong chunk này, “the smart home manufacturer” chỉ Aqara, nhưng model thay bằng Samsung, tạo câu Samsung làm việc với Samsung. Guard số không bắt được lỗi ngữ nghĩa này. Triple cuối vẫn là Samsung `PARTNERED_WITH` Aqara vì extractor lấy evidence từ title gốc; không có bằng chứng false edge từ chunk này đã đi vào graph. Chunk `69178d0227a0ff6c4b24::c0000` còn thay “the company” bằng tên sản phẩm PolsoTM; không có triple được chấp nhận. Nếu tin rewrite mà bỏ evidence gốc, các lỗi này có thể gán sai chủ thể hoặc mất cạnh sau lọc self-loop.
 
-200 chunks: 178 unchanged, 21 text rewrites và 1 rejected; `resolved` không bảo đảm một đại từ đã được phân giải đúng vì có cả sửa dấu câu. Spot-check 5 trường hợp có nhận xét trong `coref_spotcheck.csv`. Numeric guard reject `144366` → `144,366` ở `82639690c6f0f9db3de3::c0000`: giá trị không đổi nhưng cách biểu diễn khác. Cần chuẩn hóa số trước kiểm tra và thêm semantic validation cho antecedent.
+200 chunks: 178 unchanged, 21 text rewrites và 1 rejected; `resolved` không bảo đảm một đại từ đã được phân giải đúng vì có cả sửa dấu câu. Spot-check 5 trường hợp có nhận xét trong output section 5.1 notebook. Numeric guard reject `144366` → `144,366` ở `82639690c6f0f9db3de3::c0000`: giá trị không đổi nhưng cách biểu diễn khác. Cần chuẩn hóa số trước kiểm tra và thêm semantic validation cho antecedent.
 
 2. **Ngưỡng entity:** cosine ≥0.90 trên embeddings normalized, HNSW candidates, guard theo tên/type và hậu tố; Union-Find canonicalization. Precision được ưu tiên vì false merge làm lan cạnh sai.
 
@@ -24,7 +24,6 @@ Fixture tên riêng dưới đây dùng **embedding MiniLM thật**, được l�
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | synthetic name-pair fixture; real MiniLM embeddings | Technology | Microsoft Windows 11 | Microsoft Windows 11 Pro | 0.8968769311904907 | False | False | REJECT_THRESHOLD |
 | synthetic name-pair fixture; real MiniLM embeddings | Technology | Microsoft Windows 11 Pro | Microsoft Windows 11 Pro N | 0.9490051865577698 | False | True | REJECT_GUARD |
-| synthetic name-pair fixture; real MiniLM embeddings | Technology | Microsoft Azure Active Directory | Microsoft Azure Active Directory Connect | 0.85478675365448 | False | False | REJECT_THRESHOLD |
 
 Guard này ưu tiên tránh false merge nhưng có thể false split tên đầy đủ/alias. Threshold 0.90 là cấu hình baseline, chưa được hiệu chỉnh từ nhãn ER trên toàn bộ HackerNoon.
 
@@ -69,10 +68,10 @@ Phạm vi thực đo: 5000 bản ghi nguồn, 1500 bài được chọn, 1500 ch
 
 7. **Ca lỗi và giới hạn kết luận chất lượng:** các điểm Judge cuối đều 5/5 nhưng review G5000-29 phát hiện số tổng không được snippets hỗ trợ. G5000-26 có `NO_SEED` và graph context rỗng; Hybrid trả lời được nhờ vector. Lần diagnostic trước có Flat nhầm nhóm tháng 9 là tổng số, Judge Flat 1/Graph 5, nhưng Graph vẫn suy diễn số tổng. Không có ca đã kiểm chứng đủ để kết luận graph tự nó sửa được lỗi Flat. Xem `failure_analysis.md` và trace; không chọn riêng lần chạy tốt để khẳng định Graph thắng. Generator và Judge cùng Groq model nên không phải phép đánh giá độc lập.
 
-8. **Latency/token:** latency chính bao gồm retrieval + generation và loại Judge; token online Graph bao gồm seed extraction + generation. `usage_log.json` ghi request phát sinh trong phiên; cache replay không phát sinh request nên không được đếm lại. `offline_usage_summary.json` tổng hợp usage gốc của 25 coref + 25 extraction batches: 43.215 + 50.244 = 93.459 tokens, không nằm trong token/query online. Embedding chạy local CPU. Missing usage giữ trạng thái thiếu; bài nộp không quy đổi tokens thành giá tiền.
+8. **Latency/token:** latency chính bao gồm retrieval + generation và loại Judge; token online Graph bao gồm seed extraction + generation. Usage log local ghi request phát sinh trong phiên; cache replay không phát sinh request nên không được đếm lại. Thống kê checkpoint local tổng hợp usage gốc của 25 coref + 25 extraction batches: 43.215 + 50.244 = 93.459 tokens, không nằm trong token/query online. Embedding chạy local CPU. Missing usage giữ trạng thái thiếu; bài nộp không quy đổi tokens thành giá tiền.
 
 Trung bình cuối: Flat 3.514s, Hybrid 5.661s (Δ 2.146s); Flat 899.0 tokens/query, Hybrid 1179.8 (Δ 280.8). Với sample nhỏ này, Hybrid tăng token mà chưa có lợi thế chất lượng được review xác nhận. Latency chịu ảnh hưởng mạng, quota/retry và thứ tự gọi, không thể quy toàn bộ chênh lệch cho BFS. Cache replay giữ latency của request đo ban đầu, không đo lại tốc độ đọc cache.
 
-9. **Kiểm soát AI Agent:** trong phiên thực hiện, người dùng đã chọn dùng Groq cho cả pipeline và Judge sau khi cân nhắc OpenAI/Gemini. Cấu hình cuối dùng chung Groq key và ghi model/reasoning trong manifest; đây là quyết định đơn giản hóa cấu hình, không phải bằng chứng hai Judge khác nhau có chất lượng tương đương. Các biện pháp kiểm chứng thêm gồm HNSW thay cho ma trận pairwise toàn corpus, kiểm tra allowlist/evidence và giữ điểm benchmark đúng với request thật.
+9. **Kiểm soát AI Agent:** trong phiên thực hiện, người dùng đã chọn dùng Groq cho cả pipeline và Judge sau khi cân nhắc OpenAI/Gemini. Cấu hình cuối dùng chung Groq key và ghi model/reasoning trong output notebook cùng manifest local; đây là quyết định đơn giản hóa cấu hình, không phải bằng chứng hai Judge khác nhau có chất lượng tương đương. Các biện pháp kiểm chứng thêm gồm HNSW thay cho ma trận pairwise toàn corpus, kiểm tra allowlist/evidence và giữ điểm benchmark đúng với request thật.
 
 10. **Scale 350MB:** đo bottleneck trước khi scale; LLM extraction có thể bị rate limit/chi phí và indexing tăng theo số chunks. Dùng streaming, durable worker queue, batch/retry/resume, HNSW + blocking theo type, ingestion UNWIND và graph partitioning. Không gửi toàn bộ dữ liệu qua LLM trong timebox lab.
