@@ -1,0 +1,44 @@
+[
+  {
+    "id": "Q1",
+    "type": "single-hop-law",
+    "question": "Theo Luật Phòng, chống ma túy 2021, tiền chất là gì?",
+    "gold": "Tiền chất là hóa chất không thể thiếu được trong quá trình điều chế, sản xuất chất ma túy, được quy định trong danh mục tiền chất do Chính phủ ban hành.",
+    "must_include": ["điều chế", "sản xuất", "danh mục tiền chất"]
+  },
+  {
+    "id": "Q2",
+    "type": "single-hop-news",
+    "question": "Trong vụ đường dây mua bán hơn 36kg ma túy bị TAND TP.HCM xét xử ngày 28-9, những bị cáo nào lãnh án tử hình?",
+    "gold": "Trần Thanh Tuấn (25 tuổi) và Trần Minh Tâm (32 tuổi) bị tuyên tử hình về tội mua bán trái phép chất ma túy.",
+    "must_include": ["Trần Thanh Tuấn", "Trần Minh Tâm"]
+  },
+  {
+    "id": "Q3",
+    "type": "cross-kb",
+    "question": "Lê Minh Thành bị tuyên bao nhiêu tháng tù, về tội gì, và tội đó được quy định tại điều nào của Bộ luật Hình sự với khung hình phạt cơ bản bao nhiêu?",
+    "gold": "Lê Minh Thành bị tuyên 36 tháng tù về tội mua bán trái phép chất ma túy, quy định tại Điều 251 BLHS; khoản 1 phạt tù từ 02 năm đến 07 năm.",
+    "must_include": ["36 tháng", "Điều 251", "02 năm đến 07 năm"]
+  },
+  {
+    "id": "Q4",
+    "type": "cross-kb",
+    "question": "Giang hồ 'Hoàng Nato' bị bắt về hành vi gì, và hành vi đó có thể bị phạt tù tối đa bao nhiêu theo Bộ luật Hình sự?",
+    "gold": "Dương Minh Tuấn (Hoàng Nato) bị bắt về hành vi tổ chức sử dụng trái phép chất ma túy (Điều 255 BLHS); khung cao nhất là tù 20 năm hoặc tù chung thân.",
+    "must_include": ["tổ chức sử dụng", "Điều 255", "chung thân"]
+  },
+  {
+    "id": "Q5",
+    "type": "cross-kb-multi-hop",
+    "question": "Cái Quang Huy bị truy tố về tội gì với loại ma túy nào? Với khối lượng MDMA trong vụ này, khoản nào của điều luật tương ứng được áp dụng và khung hình phạt là gì?",
+    "gold": "Cái Quang Huy bị truy tố về tội vận chuyển trái phép chất ma túy (Điều 250 BLHS) với hơn 9,6kg MDMA và khoảng 406g Ketamine; MDMA từ 100 gam trở lên thuộc khoản 4 Điều 250: tù 20 năm, tù chung thân hoặc tử hình.",
+    "must_include": ["vận chuyển", "MDMA", "Điều 250", "khoản 4", "tử hình"]
+  },
+  {
+    "id": "Q6",
+    "type": "aggregation",
+    "question": "Những vụ việc nào trong tin tức có liên quan đến ma túy MDMA?",
+    "gold": "Vụ Cái Quang Huy vận chuyển hơn 9,6kg MDMA từ Đức về qua Nội Bài; vụ Lê Minh Thành và 3 thanh niên mua bán ma túy (có MDMA); vụ Viện Pháp y tâm thần Trung ương (thu giữ MDMA, ketamine, methamphetamine).",
+    "must_include": ["Cái Quang Huy", "Lê Minh Thành", "Pháp y tâm thần"]
+  }
+]

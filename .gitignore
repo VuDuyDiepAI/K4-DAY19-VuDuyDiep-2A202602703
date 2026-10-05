@@ -1,29 +1,24 @@
-# Environment variables
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.ipynb_checkpoints/
+.day19-local/
+
+# Environment
 .env
 .env.local
 
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.pytest_cache/
-
-# Jupyter Notebook checkpoints
-.ipynb_checkpoints/
-
-# Virtual environments
-venv/
-.venv/
-env/
-
-# Large Datasets and data dumps (do not commit 300MB data dumps)
-golden_dataset.csv
-!reports/*.csv
-*.jsonl
-*.parquet
-*.pq
-
-# OS files
+# OS
 .DS_Store
-Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+.omx/
+.venv/
+src_w_solution/
+
+# Instructor-only notes (chứa gợi ý/đáp án chấm bài, không public cho học viên)
+docs/INSTRUCTOR_GUIDE.md
